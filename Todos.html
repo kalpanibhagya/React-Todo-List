@@ -1,0 +1,186 @@
+<html>
+<head>
+    <meta charset="utf-8">
+	<title> Learning React.js </title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://fb.me/react-0.14.3.js"></script>
+    <script src="https://fb.me/react-dom-0.14.3.js"></script>	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.25/browser.min.js"></script>
+	<style>
+		body{
+			margin-top: 30px;
+		}
+		a.delete{
+			color: red;
+		}
+	</style>
+</head>	
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+				    <div id="app"></div>
+				</div>
+			</div>
+		</div>
+		
+		<script type="text/babel">
+			var App = React.createClass({
+
+				getInitialState: function(){
+					return{
+						text: '',
+						isEdit: 0,
+						todos: [
+							{
+								id: 1,
+								text: 'Meeting at work'
+							},
+							{
+								id: 2,
+								text: 'Bring Kids to school'
+							},
+							{
+								id: 3,
+								text: 'Food Shopping'
+							}	
+						]
+					}
+
+				},
+			    render: function(){
+				    return(					   
+							<div>
+								MY APP
+								<ToDoForm 
+								{...this.state}
+								changeText={this.handleChangeText}
+								onToDoUpdate={this.handleToDoUpdate}
+								onToDoAdd={this.handleToDoAdd}/>
+
+								<ToDoList 
+								{...this.state}
+								editToDo={this.handleToDoEdit}
+								deleteToDo={this.handleToDoDelete}/>
+							</div>		
+					)				 
+				},
+
+				handleToDoAdd: function(text){
+					var newToDo = {
+						id: this.state.todos.length + 1,
+						text: text
+					}
+
+					this.setState({todos: this.state.todos.concat(newToDo)});
+				},
+
+				handleToDoDelete: function(todo){
+					var todos = this.state.todos;
+					for(var i = 0;i < todos.length; i++ ){
+						if(todos[i].id == todo.id){
+							todos.splice(i , 1);
+						}
+					} 
+
+					this.setState({todos: todos});
+				},
+
+				handleToDoEdit: function(todo){ 
+					this.setState({
+						text: todo.text,
+						isEdit: todo.id
+					});
+				},
+
+				handleChangeText: function(text){
+					this.setState({
+						text: text
+					});
+				},
+
+				handleToDoUpdate: function(todo){
+					var todos = this.state.todos;
+					for(var i = 0;i < todos.length; i++ ){
+						if(todos[i].id == todo.id){
+							todos.splice(i , 1);
+						}
+					} 
+					todos.push(todo);
+					this.setState({todos: todos});
+				}
+
+			});
+			
+			var ToDoForm = React.createClass({
+			    render: function(){
+				    return(					   
+							<div>
+								TODO FORM
+								<form onSubmit={this.onSubmit}>
+									<div className="form-group">
+										<label>ToDo Text</label>
+										<input type="text" ref="text" value={this.props.text} onChange={this.onChange} className="form-control" />
+									</div>
+								</form>
+							</div>		
+					)				 
+				},
+
+				onChange: function(e){
+					this.props.changeText(e.target.value);
+				},
+
+				onSubmit: function(e){
+					e.preventDefault();
+					var text= this.refs.text.value.trim();
+
+					if(!text){
+						alert('Please enter a todo');
+						return;
+					}
+
+					if(this.props.isEdit){
+						var updatedToDo = {
+							id: this.props.isEdit,
+							text: text
+						}
+
+						this.props.onToDoUpdate(updatedToDo);
+					}else{
+						this.props.onToDoAdd(text);
+					}
+					
+					this.refs.text.value= '';
+				}
+			});
+
+			var ToDoList = React.createClass({
+			    render: function(){
+				    return(					   
+							<ul className="list-group">
+								{
+									this.props.todos.map(todo => {
+										return <li className="list-group-item" todo={todo} key={todo.id}><span onClick={this.editToDo.bind(this, todo)}>{todo.text}</span>  <a onClick={this.onDelete.bind(this, todo)} className="delete" href="#">x</a></li>
+									})
+								}
+							</ul>		
+					)				 
+				},
+
+				onDelete: function(todo){
+					this.props.deleteToDo(todo);
+				},
+
+				editToDo: function(todo){
+					this.props.editToDo(todo);
+				}
+			});
+
+			ReactDOM.render(
+			    <App />,
+				document.getElementById('app')
+			);
+		</script>
+    </body>	
+</html>
