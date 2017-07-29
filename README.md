@@ -1,2 +1,3 @@
 # React-Todo-List
-Simple React Components
+
+This is a simple react app. Here I've used ES5.
